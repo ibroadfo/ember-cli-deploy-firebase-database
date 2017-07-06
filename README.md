@@ -1,8 +1,10 @@
 # ember-cli-deploy-firebase-database
 
-> An Ember CLI Deploy plugin to ....... (you could add a tag line for your plugin here)
+> An Ember CLI Deploy plugin to upload index.html to a firebase database
 
-[TODO] You could write a short summary of your plugin here
+This plugin uploads a file, presumably index.html, to a specified Firebase Realtime Database.
+
+More often than not this plugin will be used in conjunction with <https://github.com/ibroadfo/ember-cli-deploy-firebase> where the ember application assets will be served from Firebase Hosting and the index.html file will be served from a Cloud Function which pulls from a Firebase Database (more explanation to follow!). However, it can be used to upload any file to a firebase db.
 
 ## What is an Ember CLI Deploy plugin?
 
@@ -12,18 +14,42 @@ For more information on what plugins are and how they work, please refer to the 
 
 ## Quick Start
 
-- Install this plugin
+To get up and running quickly, do the following:
+
+-   [Sign up for a Firebase account](https://www.firebase.com/signup/)
+
+-   Install the ember-cli-deploy tool
+
+```bash
+$ ember install ember-cli-deploy
+```
+-   Install the ember-cli-deploy-build plugin
+
+```bash
+$ ember install ember-cli-deploy-build
+```
+
+-   Install this plugin
 
 ```bash
 $ ember install ember-cli-deploy-firebase-database
 ```
 
-[TODO] You could add some sensible default config examples needed to quickly run your plugin
+-   Download a firebase service account key as per <https://firebase.google.com/docs/admin/setup#add_firebase_to_your_app> into your project directory; do *NOT* store this in git!
 
-- Run the pipeline
+-   Place the following configuration into `config/deploy.js`
+
+```javascript
+ENV.firebase-database = {
+  serviceAccountKeyPath: "./<your-service-account-key-filename>",
+  firebaseAppName: '<your-firebase-app-name>',
+}
+```
+
+-   Run the pipeline
 
 ```bash
-$ ember deploy
+$ ember deploy production
 ```
 
 ## Installation
@@ -37,35 +63,53 @@ ember install ember-cli-deploy-firebase-database
 
 For detailed information on what plugin hooks are and how they work, please refer to the [Plugin Documentation][1].
 
-[TODO] You should add a list of the pipeline hooks that your plugin implements here, for example:
-
-- `configure`
-- `build`
-- `upload`
+-   `upload`
 
 ## Configuration Options
 
 For detailed information on how configuration of plugins works, please refer to the [Plugin Documentation][1].
 
-[TODO] You should describe the config options your plugin accepts here, for example:
+### filePattern
 
-### someConfigProperty
+A file matching this pattern will be uploaded to Firebase Database.
 
-[TODO] Some description of this config property should go here
+*Default:* `'index.html'`
 
-*Default:* `'some sensible default could go here'`
+### indexKey
+
+The node key at which to store the uploaded file.
+
+*Default:* `'index_html'`
+
+### parentPath
+
+The parent path to prepend to the `indexKey` path.
+
+*Default:* `''` i.e. the indexKey is stored directly under the root
+
+### firebaseDatabaseUID
+
+The uid to be used to limit access to the database. Should be configured in your database rules e.g. `"index_html": {".write": "auth.uid === 'index_writer'"}`
+
+*Default:* `'index_writer'`
+
+### serviceAccountKeyPath
+
+The local path to the service account key downloaded from firebase, usually stored in the project directory.
+
+### firebaseAppName
+
+The name of the firebase app you wish to upload to.
 
 ## Prerequisites
 
 The following properties are expected to be present on the deployment context object:
 
-[TODO] You should describe which context properties your plugin depends on, for example:
-
-- `distDir` (provided by [ember-cli-deploy-build][2])
+-   `distDir` (provided by [ember-cli-deploy-build][2])
 
 ## Tests
 
-* yarn test
+*   yarn test
 
 ## Why `ember test` doesn't work
 
