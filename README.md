@@ -6,6 +6,8 @@ This plugin uploads a file, presumably index.html, to a specified Firebase Realt
 
 More often than not this plugin will be used in conjunction with <https://github.com/ibroadfo/ember-cli-deploy-firebase> where the ember application assets will be served from Firebase Hosting and the index.html file will be served from a Cloud Function which pulls from a Firebase Database (more explanation to follow!). However, it can be used to upload any file to a firebase db.
 
+Note that unlike other index-uploading plugins, this does not track revisions and so does not have any notion of activation; it just overwrites the specified key in the database.
+
 ## What is an Ember CLI Deploy plugin?
 
 A plugin is an addon that can be executed as a part of the Ember CLI Deploy pipeline. A plugin will implement one or more of the Ember CLI Deploy's pipeline hooks.
