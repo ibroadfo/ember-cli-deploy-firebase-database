@@ -1,6 +1,6 @@
 {
   "name": "ember-cli-deploy-firebase-database",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An Ember CLI Deploy plugin to upload index.html to a firebase database",
   "directories": {
     "doc": "doc",
