@@ -40,7 +40,7 @@ $ ember install ember-cli-deploy-firebase-database
 -   Place the following configuration into `config/deploy.js`
 
 ```javascript
-ENV.firebase-database = {
+ENV["firebase-database"] = {
   serviceAccountKeyPath: "./<your-service-account-key-filename>",
   firebaseAppName: '<your-firebase-app-name>',
 }
