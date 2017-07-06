@@ -89,7 +89,9 @@ The parent path to prepend to the `indexKey` path.
 
 ### firebaseDatabaseUID
 
-The uid to be used to limit access to the database. Should be configured in your database rules e.g. `"index_html": {".write": "auth.uid === 'index_writer'"}`
+The uid to be used to limit access to the database. Should be configured in your database rules e.g.
+
+`"index_html": {".write": "auth.uid === 'index_writer'"}`
 
 *Default:* `'index_writer'`
 
