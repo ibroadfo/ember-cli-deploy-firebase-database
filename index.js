@@ -23,7 +23,8 @@ module.exports = {
           return context.distDir || './dist';
         },
         parentPath: '',
-        indexKey: 'index_html'
+        indexKey: 'index_html',
+        firebaseDatabaseUID: 'index_writer'
       },
       requiredConfig: ['serviceAccountKeyPath', 'firebaseAppName'],
 
@@ -37,6 +38,7 @@ module.exports = {
         var parentPath            = this.readConfig('parentPath');
         var indexKey              = this.readConfig('indexKey');
         var fullPath              = parentPath + indexKey;
+        var firebaseDatabaseUID   = this.readConfig('firebaseDatabaseUID');
 
         this.log('Uploading `' + filePath + '` to `' + databaseURL + '` at `' + fullPath + '`', { verbose: true });
 
@@ -48,7 +50,7 @@ module.exports = {
           admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
             databaseURL: databaseURL,
-            databaseAuthVariableOverride: {uid:'index_writer'}
+            databaseAuthVariableOverride: { uid: firebaseDatabaseUID }
           });
 
           return this._readFileContents(filePath).then((data) => {

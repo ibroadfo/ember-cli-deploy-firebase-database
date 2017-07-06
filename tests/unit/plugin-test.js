@@ -30,7 +30,10 @@ describe('Firebase Database plugin', function() {
 
     var plugin;
     var context;
-    fireStub.initializeApp = function (){};
+    var initialOptions;
+    fireStub.initializeApp = function (options){
+      initialOptions = options;
+    };
     fireStub.credential = {
       cert: function(){}
     };
@@ -41,7 +44,8 @@ describe('Firebase Database plugin', function() {
             set: function(data) {
               return {
                 fullPath: fullPath,
-                data: data
+                data: data,
+                initialOptions: initialOptions
               };
             }
           }
@@ -97,6 +101,31 @@ describe('Firebase Database plugin', function() {
       });
     });
 
+    it('uses the specified uid', function() {
+      plugin = subject.createDeployPlugin({name:'firebase-database' });
+      context = {
+        ui: mockUi,
+        // project: stubProject,
+        config: {
+          "firebase-database": {
+            distDir: 'tests/dummy',
+            filePattern: 'index.html',
+            serviceAccountKeyPath: 'tests/dummy/bar',
+            firebaseAppName: 'foo',
+            parentPath: 'parent/',
+            indexKey: 'index',
+            firebaseDatabaseUID: 'username'
+          },
+          build: {outputPath: './dist'},
+        }
+      };
+      plugin.beforeHook(context);
+      plugin.configure(context);
+      return plugin.upload(context).then((result) => {
+        result.initialOptions.databaseAuthVariableOverride.uid.should.be.equal('username')
+        return result.data.should.be.equal('foobarbaz\n');
+      });
+    });
   });
 
   it('has a name', function() {
