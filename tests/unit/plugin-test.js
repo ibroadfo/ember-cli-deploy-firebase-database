@@ -84,7 +84,7 @@ describe('Firebase Database plugin', function() {
             serviceAccountKeyPath: 'tests/dummy/bar',
             firebaseAppName: 'foo',
             parentPath: 'parent/',
-            key: 'index'
+            indexKey: 'index'
           },
           build: {outputPath: './dist'},
         }

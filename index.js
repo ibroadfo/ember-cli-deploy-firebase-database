@@ -23,7 +23,7 @@ module.exports = {
           return context.distDir || './dist';
         },
         parentPath: '',
-        key: 'index_html'
+        indexKey: 'index_html'
       },
       requiredConfig: ['serviceAccountKeyPath', 'firebaseAppName'],
 
@@ -35,8 +35,8 @@ module.exports = {
         var firebaseAppName       = this.readConfig('firebaseAppName');
         var databaseURL           = "https://" + firebaseAppName + ".firebaseio.com";
         var parentPath            = this.readConfig('parentPath');
-        var key                   = this.readConfig('key');
-        var fullPath              = parentPath + key;
+        var indexKey              = this.readConfig('indexKey');
+        var fullPath              = parentPath + indexKey;
 
         this.log('Uploading `' + filePath + '` to `' + databaseURL + '` at `' + fullPath + '`', { verbose: true });
 
