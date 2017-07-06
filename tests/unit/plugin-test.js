@@ -38,7 +38,9 @@ describe('Firebase Database plugin', function() {
       return {
         ref: function() {
           return {
-            set: function() {}
+            set: function(data) {
+              return data;
+            }
           }
         }
       }
@@ -61,7 +63,9 @@ describe('Firebase Database plugin', function() {
       };
       plugin.beforeHook(context);
       plugin.configure(context);
-      return plugin.upload(context).should.be.fulfilled;
+      return plugin.upload(context).then((result) => {
+        return result.should.be.equal('foobarbaz\n');
+      });
     });
 
   });
