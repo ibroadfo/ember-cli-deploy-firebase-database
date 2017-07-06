@@ -37,39 +37,8 @@ describe('Firebase Database | configure hook', function() {
         instance.configure(context);
       });
 
-      let s = 'Missing required config: \`isInNeedOfSleep\`';
+      let s = 'Missing required config: \`serviceAccountKeyPath\`';
       assert.match(mockUi.messages.pop(), new RegExp(s));
-    });
-  });
-
-  describe('default config', function() {
-    let config;
-
-    beforeEach(function() {
-      config = {
-        isInNeedOfSleep: true,
-        meaningOfLife: 99
-      };
-    });
-
-    it('provides default meaning of life', function() {
-      let instance = subject.createDeployPlugin({
-        name: 'firebase-database'
-      });
-
-      delete config.meaningOfLife;
-
-      let context = {
-        ui: mockUi,
-        config: {
-          'firebase-database': config
-        }
-      };
-
-      instance.beforeHook(context);
-      instance.configure(context);
-
-      assert.equal(instance.readConfig('meaningOfLife'), 42);
     });
   });
 });

@@ -1,7 +1,13 @@
 /*eslint-env node*/
 'use strict';
 
-//const RSVP = require('rsvp');
+var path = require('path');
+var fs = require('fs');
+
+var denodeify = require('rsvp').denodeify;
+var readFile  = denodeify(fs.readFile);
+var admin = require("firebase-admin");
+
 const DeployPluginBase = require('ember-cli-deploy-plugin');
 
 module.exports = {
@@ -11,60 +17,50 @@ module.exports = {
     let DeployPlugin = DeployPluginBase.extend({
       name: options.name,
 
-      /*
-       * Define any config validation here
-       *
-       * http://ember-cli-deploy.com/docs/v1.0.x/creating-a-plugin/#validating-plugin-config
-       */
-
       defaultConfig: {
-        meaningOfLife: 42 // Example default config. Remove this.
+        filePattern: 'index.html',
+        distDir: function(context) {
+          return context.distDir || './dist';
+        },
       },
-      requiredConfig: ['isInNeedOfSleep'], // Example required config. Remove this;
+      requiredConfig: ['serviceAccountKeyPath', 'firebaseAppName'],
 
-      /*
-       * Implement any pipeline hooks here
-       *
-       * http://ember-cli-deploy.com/docs/v1.0.x/pipeline-hooks/
-       */
+      upload(/*context*/) {
+        var distDir               = this.readConfig('distDir');
+        var filePattern           = this.readConfig('filePattern');
+        var filePath              = path.join(distDir, filePattern);
+        var serviceAccountKeyPath = this.readConfig('serviceAccountKeyPath');
+        var firebaseAppName       = this.readConfig('firebaseAppName');
+        var databaseURL           = "https://" + firebaseAppName + ".firebaseio.com";
 
-      //configure(context) {
-      //  let configProp = this.readConfig('foo'); // this is how you access plugin config
-      //},
+        this.log('Uploading `' + filePath + '` to `' + databaseURL + '`', { verbose: true });
 
-      //setup(context) {
-      //  // Return an object with values you'd like merged in to the context to be accessed by other pipeline hooks and plugins
-      //  return {
-      //    someProp: 'someValue'
-      //  };
-      //},
+        return this._readFileContents(serviceAccountKeyPath).then((serviceAccount)=>{
+          this.log("read serviceAccount", { verbose: true })
+          serviceAccount = JSON.parse(serviceAccount)
 
-      //willDeploy(context) {
-      //  return RSVP.resolve(); // Return a promise if you'd like the pipeline to wait until the hook has performed some function
-      //},
+          this.log("setting up firebase", { verbose: true })
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            databaseURL: databaseURL,
+            databaseAuthVariableOverride: {uid:'index_writer'}
+          });
 
-      //willBuild(context) {},
-      //build(context) {},
-      //didBuild(context) {},
+          return this._readFileContents(filePath).then((data) => {
+            this.log("setting index", { verbose: true })
+            return admin.database().ref("index_html").set(data);
+          });
 
-      //willPrepare(context) {},
-      //prepare(context) {},
-      //didPrepare(context) {},
+        });
+      },
 
-      //willUpload(context) {},
-      //upload(context) {},
-      //didUpload(context) {},
-
-      //willActivate(context) {},
-      //activate(context) {},
-      //didActivate(context) {},
-
-      //fetchInitialRevisions(context) {},
-      //fetchRevisions(context) {},
-
-      //didDeploy(context) {},
-
-      //teardown(context) {},
+      _readFileContents: function(path) {
+        this.log("reading file " + path, { verbose: true })
+        return readFile(path)
+          .then(function(buffer) {
+            return buffer.toString();
+          });
+      },
     });
 
     return new DeployPlugin();
