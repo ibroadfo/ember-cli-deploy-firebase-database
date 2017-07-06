@@ -22,6 +22,8 @@ module.exports = {
         distDir: function(context) {
           return context.distDir || './dist';
         },
+        parentPath: '',
+        key: 'index_html'
       },
       requiredConfig: ['serviceAccountKeyPath', 'firebaseAppName'],
 
@@ -32,8 +34,11 @@ module.exports = {
         var serviceAccountKeyPath = this.readConfig('serviceAccountKeyPath');
         var firebaseAppName       = this.readConfig('firebaseAppName');
         var databaseURL           = "https://" + firebaseAppName + ".firebaseio.com";
+        var parentPath            = this.readConfig('parentPath');
+        var key                   = this.readConfig('key');
+        var fullPath              = parentPath + key;
 
-        this.log('Uploading `' + filePath + '` to `' + databaseURL + '`', { verbose: true });
+        this.log('Uploading `' + filePath + '` to `' + databaseURL + '` at `' + fullPath + '`', { verbose: true });
 
         return this._readFileContents(serviceAccountKeyPath).then((serviceAccount)=>{
           this.log("read serviceAccount", { verbose: true })
@@ -48,7 +53,7 @@ module.exports = {
 
           return this._readFileContents(filePath).then((data) => {
             this.log("setting index", { verbose: true })
-            return admin.database().ref("index_html").set(data);
+            return admin.database().ref(fullPath).set(data);
           });
 
         });

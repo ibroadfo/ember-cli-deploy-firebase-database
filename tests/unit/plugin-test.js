@@ -36,10 +36,13 @@ describe('Firebase Database plugin', function() {
     };
     fireStub.database = function() {
       return {
-        ref: function() {
+        ref: function(fullPath) {
           return {
             set: function(data) {
-              return data;
+              return {
+                fullPath: fullPath,
+                data: data
+              };
             }
           }
         }
@@ -56,7 +59,7 @@ describe('Firebase Database plugin', function() {
             distDir: 'tests/dummy',
             filePattern: 'index.html',
             serviceAccountKeyPath: 'tests/dummy/bar',
-            firebaseAppName: 'foo'
+            firebaseAppName: 'foo',
           },
           build: {outputPath: './dist'},
         }
@@ -64,7 +67,33 @@ describe('Firebase Database plugin', function() {
       plugin.beforeHook(context);
       plugin.configure(context);
       return plugin.upload(context).then((result) => {
-        return result.should.be.equal('foobarbaz\n');
+        result.fullPath.should.be.equal('index_html')
+        return result.data.should.be.equal('foobarbaz\n');
+      });
+    });
+
+    it('stores the index at the specified path', function() {
+      plugin = subject.createDeployPlugin({name:'firebase-database' });
+      context = {
+        ui: mockUi,
+        // project: stubProject,
+        config: {
+          "firebase-database": {
+            distDir: 'tests/dummy',
+            filePattern: 'index.html',
+            serviceAccountKeyPath: 'tests/dummy/bar',
+            firebaseAppName: 'foo',
+            parentPath: 'parent/',
+            key: 'index'
+          },
+          build: {outputPath: './dist'},
+        }
+      };
+      plugin.beforeHook(context);
+      plugin.configure(context);
+      return plugin.upload(context).then((result) => {
+        result.fullPath.should.be.equal('parent/index')
+        return result.data.should.be.equal('foobarbaz\n');
       });
     });
 
