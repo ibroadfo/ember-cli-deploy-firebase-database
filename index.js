@@ -40,7 +40,7 @@ module.exports = {
         var fullPath              = parentPath + indexKey;
         var firebaseDatabaseUID   = this.readConfig('firebaseDatabaseUID');
 
-        this.log('Uploading `' + filePath + '` to `' + databaseURL + '` at `' + fullPath + '`', { verbose: true });
+        this.log('Uploading `' + filePath + '` to `' + databaseURL + '` at `' + fullPath + '` as user `' + firebaseDatabaseUID + '`', { verbose: true });
 
         return this._readFileContents(serviceAccountKeyPath).then((serviceAccount)=>{
           this.log("read serviceAccount", { verbose: true })
